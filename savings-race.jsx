@@ -585,6 +585,12 @@ export default function SavingsRace() {
   .sr-ev .warn { font-size:12.5px; font-weight:800; color:#8A5B00; background:#FFF0C2; border:1.5px solid #D9A83B; border-radius:10px; padding:7px; margin-bottom:12px; }
   .sr-ev.burn { border-color:var(--impulse); box-shadow:6px 6px 0 var(--impulse); }
   .sr-ev.calm { border-color:var(--steady); box-shadow:6px 6px 0 var(--steady); }
+  .mini-joy { display:flex; align-items:center; gap:8px; margin:0 0 12px; }
+  .mini-joy .lbl { font-size:10.5px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); white-space:nowrap; }
+  .mini-joy .bar { flex:1; height:10px; background:#EFE9D6; border:2px solid var(--ink); border-radius:99px; position:relative; overflow:hidden; }
+  .mini-joy .bar > i { display:block; height:100%; }
+  .mini-joy .bar > u { position:absolute; top:-3px; bottom:-3px; width:2.5px; background:var(--impulse); left:${JOY_FLOOR}%; }
+  .mini-joy .num { font-family:'Spline Sans Mono',monospace; font-size:11.5px; font-weight:700; }
   .sr-joyrow { display:flex; justify-content:space-between; align-items:baseline; }
   .sr-joyrow .val { font-family:'Spline Sans Mono',monospace; font-weight:700; font-size:14px; }
   .sr-joybar { height:14px; background:#EFE9D6; border:2px solid var(--ink); border-radius:99px; position:relative; overflow:hidden; margin-top:7px; }
@@ -633,6 +639,17 @@ export default function SavingsRace() {
       <br />No taxes or registered accounts modelled. Your own numbers will differ.
     </div>
   );
+
+  const MiniJoy = ({ joy }) => {
+    const color = joy < JOY_FLOOR ? "var(--impulse)" : joy < JOY_WARN ? "#E8862E" : "var(--gold)";
+    return (
+      <div className="mini-joy">
+        <span className="lbl">{joy < JOY_WARN ? "⚠️ Happiness" : "Happiness"}</span>
+        <span className="bar"><i style={{ width: `${joy}%`, background: color }} /><u /></span>
+        <span className="num" style={{ color: joy < JOY_WARN ? "var(--impulse)" : "var(--ink)" }}>{Math.round(joy)}</span>
+      </div>
+    );
+  };
 
   const JoyMeter = ({ joy }) => {
     const color = joy < JOY_FLOOR ? "var(--impulse)" : joy < JOY_WARN ? "#E8862E" : "var(--gold)";
@@ -842,6 +859,7 @@ export default function SavingsRace() {
                     {!canAfford && <div className="warn">You can't afford this one.</div>}
                   </>
                 )}
+                <MiniJoy joy={s.pJoy} />
                 <div className="sr-btnrow">
                   <button className="btn red" disabled={!canAfford || !armed} onClick={() => answerEvent(true)}>{ev.kind === "creep" ? "Upgrade" : "Buy it"}</button>
                   <button className="btn green" disabled={!armed} onClick={() => answerEvent(false)}>{ev.kind === "creep" ? "Keep it simple" : "Skip it"}</button>
@@ -863,6 +881,7 @@ export default function SavingsRace() {
                   {informed && <div className="tag">💡 Invested instead ≈ {fmt(cardFuture(evNomCost, ev.year))} at {AGE_END}</div>}
                   {sells && canAfford && <div className="warn">Costs more than this year's savings — you'd sell {fmtFull(evNomCost - surY)} of investments.</div>}
                   {!canAfford && <div className="warn">You can't afford the upgrade — the old car keeps rolling.</div>}
+                  <MiniJoy joy={s.pJoy} />
                   <div className="sr-btnrow">
                     <button className="btn red" disabled={!canAfford || !armed} onClick={() => answerEvent(true)}>Upgrade</button>
                     <button className="btn green" disabled={!armed} onClick={() => answerEvent(false)}>Keep driving</button>
